@@ -5,13 +5,17 @@
   "scripts": {
     "build": "tsc -b",
     "start": "node dist/index.js",
-    "dev": "npm run build && npm run start",
-},
+    "dev": "npm run build && npm run start"
+  },
   "keywords": [],
   "dependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3"
+  },
+  "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@types/express": "^5.0.6",
-    "express": "^5.2.1"
+    "@types/express": "^5.0.6"
   },
   "author": "",
   "license": "ISC",

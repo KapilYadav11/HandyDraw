@@ -210,4 +210,20 @@ export class Game {
 
     if (this.selectedTool === "rect") {
       this.ctx.strokeRect(this.startX, this.startY, width, height);
-    } else
+    } else if (this.selectedTool === "circle") {
+      const radius = Math.max(Math.abs(width), Math.abs(height)) / 2;
+      const centerX = this.startX + (width < 0 ? -radius : radius);
+      const centerY = this.startY + (height < 0 ? -radius : radius);
+      this.ctx.beginPath();
+      this.ctx.arc(centerX, centerY, Math.abs(radius), 0, Math.PI * 2);
+      this.ctx.stroke();
+      this.ctx.closePath();
+    }
+  };
+
+  initMouseHandlers() {
+    this.canvas.addEventListener("mousedown", this.mouseDownHandler);
+    this.canvas.addEventListener("mouseup", this.mouseUpHandler);
+    this.canvas.addEventListener("mousemove", this.mouseMoveHandler);
+  }
+}

@@ -1,47 +1,91 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
+import { Eye, EyeOff, Check, X } from "lucide-react";
 import { HTTP_BACKEND } from "@/config";
 import { SketchArt } from "./SketchArt";
 import { Logo } from "./Logo";
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function AuthPage({ isSignin }: { isSignin: boolean }) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const passwordChecks = useMemo(
+    () => ({
+      length: password.length > 8,
+      capital: /^[A-Z]/.test(password),
+      number: /[0-9]/.test(password),
+      symbol: /[^a-zA-Z0-9]/.test(password),
+    }),
+    [password]
+  );
+
+  const emailValid = EMAIL_REGEX.test(email.trim());
+  const nameValid = name.trim().length >= 2;
+  const passwordValid =
+    passwordChecks.length &&
+    passwordChecks.capital &&
+    passwordChecks.number &&
+    passwordChecks.symbol;
+  const confirmValid = isSignin || confirmPassword === password;
+
+  const canSubmit = isSignin
+    ? emailValid && password.length > 0
+    : nameValid && emailValid && passwordValid && confirmValid;
+
+  function markTouched(field: string) {
+    setTouched((t) => ({ ...t, [field]: true }));
+  }
+
   async function handleSubmit() {
-    setError("");
+    setServerError("");
+
+    if (!canSubmit) {
+      setTouched({
+        name: true,
+        email: true,
+        password: true,
+        confirmPassword: true,
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       if (isSignin) {
         const res = await axios.post(`${HTTP_BACKEND}/signin`, {
-          username: email,
+          username: email.trim().toLowerCase(),
           password,
         });
         localStorage.setItem("token", res.data.token);
         router.push("/dashboard");
       } else {
         await axios.post(`${HTTP_BACKEND}/signup`, {
-          username: email,
+          username: email.trim().toLowerCase(),
           password,
-          name,
+          name: name.trim(),
         });
         const res = await axios.post(`${HTTP_BACKEND}/signin`, {
-          username: email,
+          username: email.trim().toLowerCase(),
           password,
         });
         localStorage.setItem("token", res.data.token);
         router.push("/dashboard");
       }
     } catch (e: any) {
-      setError(
+      setServerError(
         e?.response?.data?.message || "Something went wrong. Please try again."
       );
     } finally {
@@ -49,11 +93,12 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
     }
   }
 
+  const fieldFont = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
+
   return (
     <div className="flex min-h-screen w-full flex-col lg:flex-row bg-[#F3EFE6]">
       {/* Left: animated canvas panel */}
       <div className="relative flex h-56 w-full items-center justify-center overflow-hidden bg-[#14171B] lg:h-auto lg:w-[58%]">
-        {/* faint graph-paper grid */}
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.06]"
           style={{
@@ -62,12 +107,9 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
             backgroundSize: "40px 40px",
           }}
         />
-        {/* soft accent glow */}
         <div
           className="pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full opacity-20 blur-3xl"
-          style={{
-            background: isSignin ? "#3B5BFF" : "#FFB020",
-          }}
+          style={{ background: isSignin ? "#3B5BFF" : "#FFB020" }}
         />
 
         <Logo className="absolute left-8 top-8 lg:left-16 lg:top-10" />
@@ -94,19 +136,13 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
           >
             {isSignin ? "Welcome back" : "Start sketching"}
           </h2>
-          <p
-            className="mb-8 text-sm text-[#1E2530]/60"
-            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-          >
+          <p className="mb-8 text-sm text-[#1E2530]/60" style={fieldFont}>
             {isSignin
               ? "Sign in to jump back into your rooms."
               : "Create an account to start drawing with others."}
           </p>
 
-          <div
-            className="flex flex-col gap-6"
-            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-          >
+          <div className="flex flex-col gap-6" style={fieldFont}>
             {!isSignin && (
               <div className="relative">
                 <input
@@ -115,7 +151,12 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
                   placeholder=" "
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="peer w-full border-b-2 border-[#D8D2C4] bg-transparent py-2 text-[#1E2530] outline-none transition-colors focus:border-[#3B5BFF]"
+                  onBlur={() => markTouched("name")}
+                  className={`peer w-full border-b-2 bg-transparent py-2 text-[#1E2530] outline-none transition-colors ${
+                    touched.name && !nameValid
+                      ? "border-[#C0392B]"
+                      : "border-[#D8D2C4] focus:border-[#3B5BFF]"
+                  }`}
                 />
                 <label
                   htmlFor="name"
@@ -123,6 +164,11 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
                 >
                   Name
                 </label>
+                {touched.name && !nameValid && (
+                  <p className="mt-1 text-xs text-[#C0392B]">
+                    Name must be at least 2 characters
+                  </p>
+                )}
               </div>
             )}
 
@@ -133,7 +179,12 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
                 placeholder=" "
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="peer w-full border-b-2 border-[#D8D2C4] bg-transparent py-2 text-[#1E2530] outline-none transition-colors focus:border-[#3B5BFF]"
+                onBlur={() => markTouched("email")}
+                className={`peer w-full border-b-2 bg-transparent py-2 text-[#1E2530] outline-none transition-colors ${
+                  touched.email && !emailValid
+                    ? "border-[#C0392B]"
+                    : "border-[#D8D2C4] focus:border-[#3B5BFF]"
+                }`}
               />
               <label
                 htmlFor="email"
@@ -141,16 +192,26 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
               >
                 Email
               </label>
+              {touched.email && !emailValid && (
+                <p className="mt-1 text-xs text-[#C0392B]">
+                  Enter a valid email address
+                </p>
+              )}
             </div>
 
             <div className="relative">
               <input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder=" "
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="peer w-full border-b-2 border-[#D8D2C4] bg-transparent py-2 text-[#1E2530] outline-none transition-colors focus:border-[#3B5BFF]"
+                onBlur={() => markTouched("password")}
+                className={`peer w-full border-b-2 bg-transparent py-2 pr-8 text-[#1E2530] outline-none transition-colors ${
+                  touched.password && !isSignin && !passwordValid
+                    ? "border-[#C0392B]"
+                    : "border-[#D8D2C4] focus:border-[#3B5BFF]"
+                }`}
               />
               <label
                 htmlFor="password"
@@ -158,9 +219,85 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
               >
                 Password
               </label>
+              <button
+                type="button"
+                onClick={() => setShowPassword((s) => !s)}
+                className="absolute right-0 top-2.5 text-[#1E2530]/40 hover:text-[#1E2530]"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+
+              {!isSignin && (password.length > 0 || touched.password) && (
+                <ul className="mt-2 flex flex-col gap-1 text-xs">
+                  <li
+                    className={`flex items-center gap-1.5 ${
+                      passwordChecks.capital ? "text-[#2E7D32]" : "text-[#1E2530]/40"
+                    }`}
+                  >
+                    {passwordChecks.capital ? <Check size={13} /> : <X size={13} />}
+                    Starts with a capital letter
+                  </li>
+                  <li
+                    className={`flex items-center gap-1.5 ${
+                      passwordChecks.number ? "text-[#2E7D32]" : "text-[#1E2530]/40"
+                    }`}
+                  >
+                    {passwordChecks.number ? <Check size={13} /> : <X size={13} />}
+                    Contains a number
+                  </li>
+                  <li
+                    className={`flex items-center gap-1.5 ${
+                      passwordChecks.symbol ? "text-[#2E7D32]" : "text-[#1E2530]/40"
+                    }`}
+                  >
+                    {passwordChecks.symbol ? <Check size={13} /> : <X size={13} />}
+                    Contains a symbol (e.g. ! @ # $)
+                  </li>
+                  <li
+                    className={`flex items-center gap-1.5 ${
+                      passwordChecks.length ? "text-[#2E7D32]" : "text-[#1E2530]/40"
+                    }`}
+                  >
+                    {passwordChecks.length ? <Check size={13} /> : <X size={13} />}
+                    More than 8 characters
+                  </li>
+                </ul>
+              )}
             </div>
 
-            {error && <div className="text-sm text-[#C0392B]">{error}</div>}
+            {!isSignin && (
+              <div className="relative">
+                <input
+                  id="confirmPassword"
+                  type={showPassword ? "text" : "password"}
+                  placeholder=" "
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onBlur={() => markTouched("confirmPassword")}
+                  className={`peer w-full border-b-2 bg-transparent py-2 text-[#1E2530] outline-none transition-colors ${
+                    touched.confirmPassword && !confirmValid
+                      ? "border-[#C0392B]"
+                      : "border-[#D8D2C4] focus:border-[#3B5BFF]"
+                  }`}
+                />
+                <label
+                  htmlFor="confirmPassword"
+                  className="pointer-events-none absolute left-0 top-2 text-base text-[#1E2530]/40 transition-all peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-[#3B5BFF] peer-[:not(:placeholder-shown)]:-top-3.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-[#1E2530]/50"
+                >
+                  Confirm password
+                </label>
+                {touched.confirmPassword && !confirmValid && (
+                  <p className="mt-1 text-xs text-[#C0392B]">
+                    Passwords don't match
+                  </p>
+                )}
+              </div>
+            )}
+
+            {serverError && (
+              <div className="text-sm text-[#C0392B]">{serverError}</div>
+            )}
 
             <button
               disabled={loading}

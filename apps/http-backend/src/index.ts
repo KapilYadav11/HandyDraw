@@ -14,8 +14,8 @@ app.use(express.json());
 app.post("/signup", async (req, res) => {
   const parsedData = CreateUserSchema.safeParse(req.body);
   if (!parsedData.success) {
-    res.json({
-      message: "Incorrect input",
+    res.status(400).json({
+      message: parsedData.error.issues[0]?.message || "Incorrect input",
     });
     return;
   }
@@ -25,21 +25,25 @@ app.post("/signup", async (req, res) => {
 
     const user = await prismaClient.user.create({
       data: {
-        email: parsedData.data?.username,
+        email: parsedData.data.username,
         password: hashedPassword,
-        name: parsedData.data?.name,
+        name: parsedData.data.name,
       },
     });
-
-    console.log("User created:", user);
 
     res.json({
       userId: user.id,
     });
-  } catch (e) {
+  } catch (e: any) {
+    if (e?.code === "P2002") {
+      res.status(409).json({
+        message: "An account with this email already exists. Please sign in instead.",
+      });
+      return;
+    }
     console.error("Error creating user:", e);
-    res.status(411).json({
-      message: "User already exist",
+    res.status(500).json({
+      message: "Something went wrong. Please try again.",
     });
   }
 });
@@ -47,8 +51,8 @@ app.post("/signup", async (req, res) => {
 app.post("/signin", async (req, res) => {
   const parsedData = SigninSchema.safeParse(req.body);
   if (!parsedData.success) {
-    res.json({
-      message: "Incorrect inputs",
+    res.status(400).json({
+      message: parsedData.error.issues[0]?.message || "Incorrect inputs",
     });
     return;
   }
@@ -61,7 +65,7 @@ app.post("/signin", async (req, res) => {
 
   if (!user) {
     res.status(403).json({
-      message: "Invalid Credentials",
+      message: "No account found with this email. Please sign up first.",
     });
     return;
   }
@@ -70,7 +74,7 @@ app.post("/signin", async (req, res) => {
 
   if (!validPassword) {
     res.status(403).json({
-      message: "Invalid Credentials",
+      message: "Incorrect password. Please try again.",
     });
     return;
   }
@@ -90,8 +94,8 @@ app.post("/signin", async (req, res) => {
 app.post("/room", middleware, async (req, res) => {
   const parsedData = CreateRoomSchema.safeParse(req.body);
   if (!parsedData.success) {
-    res.json({
-      message: "Incorrect inputs",
+    res.status(400).json({
+      message: parsedData.error.issues[0]?.message || "Incorrect inputs",
     });
     return;
   }
@@ -108,8 +112,8 @@ app.post("/room", middleware, async (req, res) => {
       roomId: room.id,
     });
   } catch (e) {
-    res.status(411).json({
-      message: "User already exist with this username",
+    res.status(500).json({
+      message: "Could not create room. Please try again.",
     });
   }
 });

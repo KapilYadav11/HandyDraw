@@ -13,6 +13,7 @@
     "@repo/common": "workspace:*",
     "@repo/ui": "workspace:*",
     "axios": "^1.7.9",
+    "framer-motion": "^11.15.0",
     "lucide-react": "^0.473.0",
     "next": "15.1.5",
     "react": "^19.0.0",

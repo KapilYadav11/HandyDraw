@@ -6,7 +6,6 @@ import {
   motion,
   useMotionValue,
   useSpring,
-  useTransform,
 } from "framer-motion";
 import { ArrowRight, Sparkles, Undo2 } from "lucide-react";
 
@@ -160,10 +159,20 @@ export function Hero() {
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 pt-32 pb-20 lg:px-16">
       {/* ambient mesh glow */}
-      <div className="pointer-events-none absolute -left-40 top-0 h-[32rem] w-[32rem] rounded-full bg-[#3B5BFF]/25 blur-[120px]" />
-      <div className="pointer-events-none absolute -right-32 top-40 h-[28rem] w-[28rem] rounded-full bg-[#FFB020]/15 blur-[120px]" />
+      <div className="pointer-events-none absolute -left-40 top-0 h-[32rem] w-[32rem] rounded-full bg-[#3B5BFF]/20 blur-[120px] dark:bg-[#3B5BFF]/25" />
+      <div className="pointer-events-none absolute -right-32 top-40 h-[28rem] w-[28rem] rounded-full bg-[#FFB020]/10 blur-[120px] dark:bg-[#FFB020]/15" />
+
+      {/* grid, swapped per theme */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.05]"
+        className="pointer-events-none absolute inset-0 opacity-[0.05] dark:hidden"
+        style={{
+          backgroundImage:
+            "linear-gradient(#14171B 1px, transparent 1px), linear-gradient(90deg, #14171B 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-0 hidden opacity-[0.05] dark:block"
         style={{
           backgroundImage:
             "linear-gradient(#F3EFE6 1px, transparent 1px), linear-gradient(90deg, #F3EFE6 1px, transparent 1px)",
@@ -178,7 +187,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs text-[#F3EFE6]/80 backdrop-blur-sm"
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/5 px-3.5 py-1.5 text-xs text-[#14171B]/80 backdrop-blur-sm dark:border-white/10 dark:bg-white/5 dark:text-[#F3EFE6]/80"
           >
             <motion.span
               animate={{ opacity: [1, 0.4, 1] }}
@@ -193,7 +202,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl leading-[1.1] text-[#F3EFE6] sm:text-5xl lg:text-6xl"
+            className="text-4xl leading-[1.1] text-[#14171B] sm:text-5xl lg:text-6xl dark:text-[#F3EFE6]"
             style={{ fontFamily: "'Fraunces', serif" }}
           >
             A room to{" "}
@@ -208,7 +217,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-6 max-w-md text-base text-[#F3EFE6]/60 lg:text-lg"
+            className="mt-6 max-w-md text-base text-[#14171B]/60 dark:text-[#F3EFE6]/60 lg:text-lg"
           >
             Open a room, share the link, and watch every line appear live for
             everyone in it. No installs, no setup — just draw.
@@ -222,7 +231,7 @@ export function Hero() {
           >
             <MagneticButton
               href="/signup"
-              className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-[#F3EFE6] px-6 py-3 font-medium text-[#14171B]"
+              className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-[#14171B] px-6 py-3 font-medium text-[#F3EFE6] dark:bg-[#F3EFE6] dark:text-[#14171B]"
             >
               <span className="relative z-10">Create an account</span>
               <ArrowRight
@@ -234,7 +243,7 @@ export function Hero() {
 
             <Link
               href="/signin"
-              className="inline-flex items-center gap-2 rounded-full border border-white/15 px-6 py-3 font-medium text-[#F3EFE6] transition-colors hover:border-white/40"
+              className="inline-flex items-center gap-2 rounded-full border border-black/15 px-6 py-3 font-medium text-[#14171B] transition-colors hover:border-black/40 dark:border-white/15 dark:text-[#F3EFE6] dark:hover:border-white/40"
             >
               Sign in
             </Link>
@@ -248,7 +257,7 @@ export function Hero() {
           transition={{ duration: 0.7, delay: 0.2 }}
           className="relative"
         >
-          <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+          <div className="rounded-3xl border border-black/10 bg-black/[0.03] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
             <div className="mb-3 flex items-center justify-between px-1">
               <div className="flex gap-1.5">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#FF5D5D]/70" />
@@ -256,7 +265,7 @@ export function Hero() {
                 <span className="h-2.5 w-2.5 rounded-full bg-[#3B5BFF]/70" />
               </div>
               <span
-                className="text-xs text-[#F3EFE6]/40"
+                className="text-xs text-[#14171B]/40 dark:text-[#F3EFE6]/40"
                 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
               >
                 try it — draw below
@@ -270,7 +279,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9, duration: 0.5 }}
-            className="absolute -right-4 -top-4 flex items-center gap-1.5 rounded-full border border-white/10 bg-[#14171B]/90 px-3 py-1.5 text-xs text-[#F3EFE6]/80 shadow-lg backdrop-blur-md"
+            className="absolute -right-4 -top-4 flex items-center gap-1.5 rounded-full border border-black/10 bg-white/90 px-3 py-1.5 text-xs text-[#14171B]/80 shadow-lg backdrop-blur-md dark:border-white/10 dark:bg-[#14171B]/90 dark:text-[#F3EFE6]/80"
           >
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#4ADE80]" />
             live sync

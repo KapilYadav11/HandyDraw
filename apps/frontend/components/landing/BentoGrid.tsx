@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
-import { Users, Shapes, Gauge } from "lucide-react";
+import { Users } from "lucide-react";
 
 function GlowCard({
   children,
@@ -24,7 +24,7 @@ function GlowCard({
     <div
       ref={ref}
       onMouseMove={handleMove}
-      className={`group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] ${className}`}
+      className={`group relative overflow-hidden rounded-3xl border border-black/10 bg-black/[0.02] dark:border-white/10 dark:bg-white/[0.03] ${className}`}
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -63,20 +63,20 @@ function CodePreviewCard() {
     <GlowCard className="p-6 sm:col-span-2 sm:row-span-2">
       <div className="mb-4 flex items-center justify-between">
         <h3
-          className="text-lg text-[#F3EFE6]"
+          className="text-lg text-[#14171B] dark:text-[#F3EFE6]"
           style={{ fontFamily: "'Fraunces', serif" }}
         >
           Every line, broadcast instantly
         </h3>
-        <div className="flex gap-1 rounded-full bg-black/30 p-1 text-xs">
+        <div className="flex gap-1 rounded-full bg-black/5 p-1 text-xs dark:bg-black/30">
           {(["payload", "broadcast"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
               className={`rounded-full px-3 py-1 transition-colors ${
                 tab === t
-                  ? "bg-white/10 text-[#F3EFE6]"
-                  : "text-[#F3EFE6]/40 hover:text-[#F3EFE6]/70"
+                  ? "bg-black/10 text-[#14171B] dark:bg-white/10 dark:text-[#F3EFE6]"
+                  : "text-[#14171B]/40 hover:text-[#14171B]/70 dark:text-[#F3EFE6]/40 dark:hover:text-[#F3EFE6]/70"
               }`}
             >
               {t === "payload" ? "Payload" : "Server"}
@@ -133,7 +133,7 @@ function CodePreviewCard() {
           </pre>
         )}
       </div>
-      <p className="mt-4 text-sm text-[#F3EFE6]/50">
+      <p className="mt-4 text-sm text-[#14171B]/50 dark:text-[#F3EFE6]/50">
         Shapes are sent over WebSocket the instant you draw them, and pushed
         to everyone else already in the room.
       </p>
@@ -147,16 +147,16 @@ function BrushSizeCard() {
   return (
     <GlowCard className="p-6">
       <h3
-        className="mb-1 text-base text-[#F3EFE6]"
+        className="mb-1 text-base text-[#14171B] dark:text-[#F3EFE6]"
         style={{ fontFamily: "'Fraunces', serif" }}
       >
         Your stroke, your call
       </h3>
-      <p className="mb-6 text-sm text-[#F3EFE6]/50">
+      <p className="mb-6 text-sm text-[#14171B]/50 dark:text-[#F3EFE6]/50">
         Pencil, rectangle, or circle — adjust and draw your way.
       </p>
 
-      <div className="flex flex-1 items-center justify-center rounded-2xl bg-[#0F1114] py-8">
+      <div className="flex flex-1 items-center justify-center rounded-2xl bg-black/[0.03] py-8 dark:bg-[#0F1114]">
         <div
           className="rounded-full bg-[#3B5BFF] transition-all duration-150"
           style={{ width: size * 2, height: size * 2 }}
@@ -191,7 +191,8 @@ function SyncGaugeCard() {
               cy="50"
               r="42"
               fill="none"
-              stroke="rgba(255,255,255,0.08)"
+              stroke="currentColor"
+              className="text-black/10 dark:text-white/10"
               strokeWidth="8"
             />
             <motion.circle
@@ -214,14 +215,14 @@ function SyncGaugeCard() {
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
             <span
-              className="text-2xl text-[#F3EFE6]"
+              className="text-2xl text-[#14171B] dark:text-[#F3EFE6]"
               style={{ fontFamily: "'Fraunces', serif" }}
             >
               {pct}%
             </span>
           </div>
         </div>
-        <p className="mt-4 text-sm text-[#F3EFE6]/50">
+        <p className="mt-4 text-sm text-[#14171B]/50 dark:text-[#F3EFE6]/50">
           of strokes appear for teammates in under 100ms
         </p>
       </div>
@@ -240,16 +241,16 @@ function SmallFeatureCard({
 }) {
   return (
     <GlowCard className="p-6">
-      <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-[#F3EFE6]/80">
+      <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-black/5 text-[#14171B]/80 dark:bg-white/5 dark:text-[#F3EFE6]/80">
         {icon}
       </div>
       <h3
-        className="mb-1 text-base text-[#F3EFE6]"
+        className="mb-1 text-base text-[#14171B] dark:text-[#F3EFE6]"
         style={{ fontFamily: "'Fraunces', serif" }}
       >
         {title}
       </h3>
-      <p className="text-sm text-[#F3EFE6]/50">{description}</p>
+      <p className="text-sm text-[#14171B]/50 dark:text-[#F3EFE6]/50">{description}</p>
     </GlowCard>
   );
 }
@@ -269,12 +270,12 @@ export function BentoGrid() {
     <section id="features" className="relative px-6 py-28 lg:px-16">
       <div className="mx-auto mb-14 max-w-2xl text-center">
         <h2
-          className="text-3xl text-[#F3EFE6] sm:text-4xl"
+          className="text-3xl text-[#14171B] dark:text-[#F3EFE6] sm:text-4xl"
           style={{ fontFamily: "'Fraunces', serif" }}
         >
           Built for drawing together
         </h2>
-        <p className="mt-3 text-[#F3EFE6]/50">
+        <p className="mt-3 text-[#14171B]/50 dark:text-[#F3EFE6]/50">
           No file exports, no refreshing — just a shared canvas that stays in
           sync.
         </p>

@@ -16,6 +16,12 @@ const strongPasswordField = z
   .regex(/[0-9]/, "Password must include at least one number")
   .regex(/[^a-zA-Z0-9]/, "Password must include at least one symbol");
 
+const otpField = z
+  .string()
+  .trim()
+  .length(6, "OTP must be 6 digits")
+  .regex(/^[0-9]{6}$/, "OTP must be 6 digits");
+
 export const CreateUserSchema = z.object({
   username: emailField,
   password: strongPasswordField,
@@ -41,4 +47,28 @@ export const CreateRoomSchema = z.object({
       /^[a-zA-Z0-9-_]+$/,
       "Room name can only contain letters, numbers, - and _"
     ),
+});
+
+export const VerifySignupOtpSchema = z.object({
+  email: emailField,
+  otp: otpField,
+});
+
+export const ResendSignupOtpSchema = z.object({
+  email: emailField,
+});
+
+export const ForgotPasswordSchema = z.object({
+  email: emailField,
+});
+
+export const VerifyResetOtpSchema = z.object({
+  email: emailField,
+  otp: otpField,
+});
+
+export const ResetPasswordSchema = z.object({
+  email: emailField,
+  otp: otpField,
+  password: strongPasswordField,
 });

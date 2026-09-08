@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/middleware.ts"],"version":"5.9.2"}
+{"root":["./src/index.ts","./src/mailer.ts","./src/middleware.ts","./src/otp.ts"],"version":"5.9.2"}

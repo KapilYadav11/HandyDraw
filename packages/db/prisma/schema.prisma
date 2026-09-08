@@ -18,6 +18,7 @@ model User{
   password     String
   name         String
   photo        String?
+  emailVerified Boolean @default(true)
   room         Room[]
   chat         Chat[]
 }
@@ -41,4 +42,18 @@ model Chat{
 
 }
 
+model OtpVerification {
+  id                  String   @id @default(uuid())
+  email               String
+  purpose             String
+  otpHash             String
+  expiresAt           DateTime
+  attempts            Int      @default(0)
+  consumed            Boolean  @default(false)
+  pendingName         String?
+  pendingPasswordHash String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
+  @@index([email, purpose])
+}
